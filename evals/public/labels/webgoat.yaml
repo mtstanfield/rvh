@@ -1,0 +1,30 @@
+- id: webgoat-sqli-challenge-register-1
+  repo: webgoat
+  file: src/main/java/org/owasp/webgoat/lessons/sqlinjection/advanced/SqlInjectionChallenge.java
+  sink_line: 62
+  span: [59, 62]
+  cwe: CWE-89
+  family: sql-injection
+  severity: high
+  truth: positive
+  status: gated
+  evidence: "registerNewUser concatenates the username_reg parameter into the existence-check query (line 60) and runs it with Statement.executeQuery (line 62); the differing user-exists / user-created responses make it a boolean blind injection, e.g. tom' AND substring(password,1,1)='a, that recovers tom's password. Gated: lesson endpoints need a (self-registered) WebGoat login."
+  source: advisory
+  source_ref: "https://github.com/WebGoat/WebGoat/blob/3284a8e466dfde083858f681e89aabb94e8b9c9e/src/main/resources/lessons/sqlinjection/i18n/WebGoatLabels.properties#L99-L105"
+  reviewed_by: [claude-code]
+  labeled_by: {job: public-demo, prompt_version: 1, date: 2026-09-24}
+- id: webgoat-deserialization-task-1
+  repo: webgoat
+  file: src/main/java/org/owasp/webgoat/lessons/deserialization/InsecureDeserializationTask.java
+  sink_line: 45
+  span: [40, 45]
+  cwe: CWE-502
+  family: deserialization
+  severity: high
+  truth: positive
+  status: gated
+  evidence: "completed() base64-decodes the token request parameter into an ObjectInputStream and calls readObject() (line 45) before any type check, so a crafted stream runs whatever readObject gadgets are on the classpath; the bundled org.dummy.insecure.framework.VulnerableTaskHolder passes its taskAction to Runtime.exec (limited there to short sleep/ping commands). Gated: lesson endpoints need a (self-registered) WebGoat login."
+  source: advisory
+  source_ref: "https://github.com/WebGoat/WebGoat/blob/3284a8e466dfde083858f681e89aabb94e8b9c9e/src/main/resources/lessons/deserialization/documentation/InsecureDeserialization_Task.adoc?plain=1"
+  reviewed_by: [claude-code]
+  labeled_by: {job: public-demo, prompt_version: 1, date: 2026-09-24}

@@ -1,0 +1,22 @@
+# Public demo corpus: intentionally-vulnerable training apps, plus two
+# pre-fix pins of projects with published GitHub Security Advisories.
+- id: juice-shop
+  source: https://github.com/juice-shop/juice-shop
+  commit: 1618a611b173b4bf114028e6e02549950606e29d
+  framework_hints: [express, node]
+- id: nodegoat
+  source: https://github.com/OWASP/NodeGoat
+  commit: c5cb68a7084e4ae7dcc60e6a98768720a81841e8
+  framework_hints: [express, node]
+- id: webgoat
+  source: https://github.com/WebGoat/WebGoat
+  commit: 3284a8e466dfde083858f681e89aabb94e8b9c9e
+  framework_hints: [spring, java]
+- id: rucio-pre-64c0e6a6
+  source: https://github.com/rucio/rucio
+  commit: e1aca4f47021b7ed5b647e37e11c1816e2b56777
+  framework_hints: [flask, python]
+- id: zeek-pre-a3f1c650
+  source: https://github.com/zeek/zeek
+  commit: 534734f53fa6234b593e0c1163bf8f69a366e36a
+  framework_hints: []

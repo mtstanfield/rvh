@@ -1,0 +1,64 @@
+version: 1.0.0
+title: "Vulnerability analysis worker"
+description: |
+  Single-agent vulnerability review for one anchor. Reads the anchor,
+  queries CPG, walks trust boundaries, and emits one structured
+  recipe__final_output(...) call validated against the schema below.
+  worker.py extracts the structured object from goose stdout and
+  ingest persists it to state.db + renders task-N.md for humans. The
+  provider, model and turn limit come from goose's CLI flags.
+parameters:
+  - key: rendered_prompt
+    input_type: string
+    requirement: required
+    description: |
+      Pre-rendered worker prompt (Python str.format applied by
+      scripts/worker.py via prompts.loader.load_prompt). The recipe
+      treats it as the user-turn body verbatim.
+prompt: |
+  {{ rendered_prompt }}
+response:
+  json_schema:
+    type: object
+    required: [verdict, anchor_file, task_id, summary, findings]
+    properties:
+      verdict:
+        enum: [finding, no-finding]
+      anchor_file:
+        type: string
+      task_id:
+        type: integer
+      summary:
+        type: string
+        maxLength: 8000
+      dynamic_evidence:
+        type: boolean
+        default: false
+      findings:
+        type: array
+        items:
+          type: object
+          required: [finding_type, cwe, severity, title, sink_location, sink_category, why_insufficient]
+          properties:
+            finding_type:
+              type: string
+            cwe:
+              type: string
+              pattern: "^CWE-[0-9]+$"
+            severity:
+              enum: [info, low, medium, high, critical]
+            confidence:
+              enum: [low, medium, high]
+            title:
+              type: string
+              maxLength: 120
+            sink_location:
+              type: string
+            sink_category:
+              enum: [shell, sql, fs, url, deserialization, template, authorization, crypto, logging]
+            summary:
+              type: string
+            source_to_sink:
+              type: string
+            why_insufficient:
+              type: string

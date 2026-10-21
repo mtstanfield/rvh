@@ -1,0 +1,15 @@
+- id: zeek-pre-a3f1c650-udp-contents-oob-read-1
+  repo: zeek-pre-a3f1c650
+  file: src/packet_analysis/protocol/udp/UDP.cc
+  sink_line: 176
+  span: [147, 176]
+  cwe: CWE-125
+  family: memory-safety
+  severity: medium
+  truth: positive
+  status: confirmed
+  evidence: 'GHSA-q48f-3qm2-j875: DeliverPacket builds the udp_contents event string as StringVal(len, data) (line 176) where len is the IP-declared payload length minus the UDP header (line 140), not the captured bytes (remaining); a packet whose declared length exceeds what is on the wire makes Zeek read past the end of the packet buffer when udp_contents is handled.'
+  source: advisory
+  source_ref: https://github.com/zeek/zeek/security/advisories/GHSA-q48f-3qm2-j875
+  reviewed_by: [claude-code]
+  labeled_by: {job: advisory-mine, prompt_version: 1, date: '2026-09-24'}

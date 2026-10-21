@@ -1,0 +1,30 @@
+{
+  "cpg": "ok",
+  "eval_id": "20260924-1457-smoke-qwen38-27b",
+  "input_tokens": 363878,
+  "leftover_containers": [],
+  "leftover_networks": [],
+  "miss_attribution": {
+    "looked_and_missed": 1,
+    "never_looked": 0,
+    "unknown": 0
+  },
+  "model": "qwen38-27b",
+  "report_failure_rate": 0.0,
+  "suite": "smoke",
+  "tasks": {
+    "finished": 1,
+    "seeded": 1
+  },
+  "tool_calls": {
+    "cpg": 8,
+    "final": 1,
+    "other": 1,
+    "shell": 9,
+    "todo": 2
+  },
+  "turns_mean": 13,
+  "unadvertised_tools": {},
+  "wall_median_s": 206.083,
+  "worker_image": "rvh-worker:de13792efeaf"
+}

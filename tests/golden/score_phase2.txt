@@ -1,0 +1,63 @@
+You are triaging source files for downstream code-review effort allocation. Each file gets an integer 1-5 indicating how much reviewer attention it warrants based on the type of logic it implements.
+
+## Output format
+
+Output is JSONL — one JSON object per line, one line per input file, nothing else. No prose, no markdown headings, no analysis, no code fences, no array wrapper.
+
+Each line: `{"path": ..., "score": ..., "rationale": ...}` — compact, single space after each colon, complete on one line.
+
+Example — two consecutive output lines:
+
+```
+{"path": "internal/util/http.go", "score": 4, "rationale": "outbound HTTP client used by all handlers; connection and auth setup"}
+{"path": "handlers/debug.go", "score": 2, "rationale": "pprof wrapper, build-tag guarded, not in production path"}
+```
+
+## Priority scale (1-5)
+
+- **5 — Top priority.** Parses incoming network or user-supplied data; implements authentication, authorization, or access-control checks; performs cryptographic operations; constructs shell commands, database queries, or filesystem paths from external data.
+- **4 — Likely priority.** Production code that crosses a trust boundary or sits one hop from an external entry point (e.g., internal API consumed by a public handler).
+- **3 — Possible priority.** Production logic with non-trivial data handling and no obvious external interface.
+- **2 — Lower priority.** Internal utilities, helpers, glue code, configuration without external input.
+- **1 — Skip.** Constants, generated schemas, fixtures — no executable logic.
+
+Test code, CI configuration, documentation, tooling, and generated code score 1-2.
+
+**Critical:** Production source files (under `src/`, `lib/`, `internal/`, or the main code directory) with real execution logic stay at minimum 3, even when the sampled snippet looks innocuous. Concurrency primitives, file I/O, parsing, shared-state mutation, and non-trivial function bodies all warrant reviewer attention. Judge by what the code does, not by what the path is named — "monitoring", "logging", "telemetry", "debug" do not lower priority when the file implements logic. Any `.cpp` / `.c` / `.go` / `.py` file under a source directory with concurrency primitives, file I/O, parsing, shared-state mutation, or non-trivial function bodies is minimum score 3.
+
+This is a re-score: let actual code behavior nudge the score up or down from the path-only intuition. An `internal/` file that's an HTTP handler should rise; a handler package containing only constants should fall.
+
+Near-duplicate files (same parent class, same shape, different model name) get the same score — emit one JSONL line per file with matching scores; do not narrate the duplication.
+
+
+## This Repository's Layout
+
+Production code (rank by content, up to 5): src/
+Test code (rank 1-2): test/
+CI config (rank 1): .github/
+Documentation (rank 1): docs/
+Developer tooling (rank 1-2): tools/
+Generated code (rank 1): (none identified)
+Context: C++ library with a small CLI.
+
+
+## Schema
+
+- `path`: repo-relative path, verbatim
+- `score`: integer 1–5
+- `rationale`: one sentence under 25 words, citing what the code does
+
+## Output rules
+
+- One JSON object per line. Each line is a complete object — NEVER break an object across multiple lines.
+- Compact form only: `{"path": ..., "score": ..., "rationale": ...}`. No pretty-printing, no indentation, no spaces between fields beyond the single space after each colon shown above.
+- No array wrapper. No trailing commas. No prose, headings, or code fences.
+- Every input file appears exactly once.
+- If low on tokens: score every file, truncate rationales if needed.
+
+## Files
+
+### src/scitokens_internal.cpp
+```
+int verify(const char *tok) { return 0; }
+```

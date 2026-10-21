@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# rvh — entry point.
+#
+# Self-bootstrapping: creates ./.venv on first use (and rebuilds it if the
+# interpreter is missing, e.g. a venv copied from another machine), installs
+# the package in editable mode, then execs the orchestrator. Subsequent runs
+# skip straight to the exec. All args pass through verbatim.
+#
+# Usage:
+#   ./rvh --repo ~/projects/target --endpoint http://host:8000/v1 --model <model>
+#   ./rvh eval --corpus CORPUS --suite quick --endpoint URL --model NAME
+#
+# One-shot regenerate: rm -rf .venv && ./rvh --help
+set -euo pipefail
+
+cd "$(dirname "$(readlink -f "$0" 2>/dev/null || python3 -c 'import os,sys;print(os.path.realpath(sys.argv[1]))' "$0")")"
+
+if [ ! -x .venv/bin/python ]; then
+    # A .venv carried over from another machine — or left behind by a Python
+    # that has since been uninstalled — has a dangling interpreter symlink.
+    # `python3 -m venv` cannot repair one in place: it fails with
+    # "[Errno 2] No such file or directory" and set -e kills the script. Clear
+    # it out first so a broken venv self-heals instead of wedging every run.
+    if [ -e .venv ] || [ -L .venv ]; then
+        echo "[rvh] .venv/ has no usable interpreter — rebuilding" >&2
+        rm -rf .venv
+    else
+        echo "[rvh] first run — creating .venv/" >&2
+    fi
+    python3 -m venv .venv
+    .venv/bin/pip install --upgrade pip >&2
+    .venv/bin/pip install -e . >&2
+    echo "[rvh] .venv ready" >&2
+fi
+
+if [ "${1:-}" = "eval" ]; then
+    shift
+    exec .venv/bin/python scripts/eval_cli.py "$@"
+fi
+exec .venv/bin/python scripts/run_repo_vuln_hunt.py "$@"

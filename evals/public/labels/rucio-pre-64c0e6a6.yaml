@@ -1,0 +1,15 @@
+- id: rucio-pre-64c0e6a6-signurl-account-header-1
+  repo: rucio-pre-64c0e6a6
+  file: lib/rucio/web/rest/flaskapi/v1/credentials.py
+  sink_line: 194
+  span: [165, 194]
+  cwe: CWE-639
+  family: authorization
+  severity: high
+  truth: positive
+  status: gated
+  evidence: "GHSA-5j9r-fx4x-rpvg (CVE-2026-58273): SignURL.get() takes the authorization principal from the client-supplied X-Rucio-Account header (line 165; VO from X-Rucio-VO via extract_vo at 164) instead of request.environ['issuer'] set from the validated token, and passes it to get_signed_url(account, ...) (line 194), whose permission check perm_get_signed_url is _is_root(issuer). Any holder of a valid low-privilege token can send X-Rucio-Account: root and have the server mint presigned read/write/delete URLs for arbitrary objects with the RSE's stored S3/GCS/Swift credentials. Gated: needs any valid auth token and a cloud-backed RSE."
+  source: advisory
+  source_ref: "https://github.com/rucio/rucio/security/advisories/GHSA-5j9r-fx4x-rpvg"
+  reviewed_by: [claude-code]
+  labeled_by: {job: advisory-mine, prompt_version: 1, date: 2026-09-24}

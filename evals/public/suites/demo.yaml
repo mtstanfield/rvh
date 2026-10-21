@@ -1,0 +1,17 @@
+# Public demo suite: one whole-file anchor per labeled file. Training-app
+# anchors come from Juice Shop, NodeGoat, and WebGoat's own documentation;
+# the rucio and zeek anchors are pre-fix pins of published GHSAs.
+# For demonstration only, never a decision: the training apps mark their own
+# bugs in the source (`vuln-code-snippet vuln-line`, "// Insecure use of
+# eval()") and are widely trained on, so recall here overstates real-world recall.
+kind: demo
+repeats: 1
+anchors:
+  - {id: juice-shop-login, repo: juice-shop, path: routes/login.ts, tags: [typescript, express, sql-injection, demo]}
+  - {id: juice-shop-xml, repo: juice-shop, path: lib/xml.ts, tags: [typescript, express, xxe, demo]}
+  - {id: nodegoat-contributions, repo: nodegoat, path: app/routes/contributions.js, tags: [javascript, express, code-injection, demo]}
+  - {id: nodegoat-research, repo: nodegoat, path: app/routes/research.js, tags: [javascript, express, ssrf, demo]}
+  - {id: webgoat-sqli-challenge, repo: webgoat, path: src/main/java/org/owasp/webgoat/lessons/sqlinjection/advanced/SqlInjectionChallenge.java, tags: [java, spring, sql-injection, demo]}
+  - {id: webgoat-deserialization, repo: webgoat, path: src/main/java/org/owasp/webgoat/lessons/deserialization/InsecureDeserializationTask.java, tags: [java, spring, deserialization, demo]}
+  - {id: rucio-signurl, repo: rucio-pre-64c0e6a6, path: lib/rucio/web/rest/flaskapi/v1/credentials.py, tags: [python, flask, authorization, demo]}
+  - {id: zeek-udp-contents, repo: zeek-pre-a3f1c650, path: src/packet_analysis/protocol/udp/UDP.cc, tags: [cpp, memory-safety, demo]}

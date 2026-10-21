@@ -1,0 +1,17 @@
+<PYTHON>
+<RVH>/scripts/run_autonomous_v2.py
+--repo
+<TMP>/repo
+--run-dir
+<TMP>/repo/.rvh-runs
+--parallelism
+2
+--min-priority
+2
+--image
+rvh-worker:golden
+--network
+rvh-repo-abc123-net
+--model
+qwen38-27b
+ENV RVH_CPG_ENDPOINT=http://rvh-cpg:8080

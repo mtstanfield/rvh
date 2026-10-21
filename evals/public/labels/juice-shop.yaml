@@ -1,0 +1,33 @@
+- id: juice-shop-login-sqli-1
+  repo: juice-shop
+  file: routes/login.ts
+  sink_line: 34
+  span: [32, 34]
+  cwe: CWE-89
+  family: sql-injection
+  severity: critical
+  truth: positive
+  status: confirmed
+  evidence: "The unauthenticated POST /rest/user/login handler interpolates req.body.email straight into the raw SQL passed to models.sequelize.query (line 34), so an email like admin@juice-sh.op'-- comments out the password check and logs in as any user without their password."
+  source: advisory
+  source_ref: "https://github.com/juice-shop/pwning-juice-shop/blob/d5488d68b4cd892784494224e4f6b8f48102cc30/docs/modules/ROOT/pages/part2/injection.adoc?plain=1#L196-L202"
+  reviewed_by: [claude-code]
+  labeled_by: {job: public-demo, prompt_version: 1, date: 2026-09-24}
+- id: juice-shop-xml-xxe-1
+  repo: juice-shop
+  file: lib/xml.ts
+  sink_line: 38
+  span: [33, 38]
+  cwe: CWE-611
+  family: xxe
+  severity: high
+  truth: positive
+  status: gated
+  evidence: "parseXmlString parses caller-supplied XML with XML_PARSE_NOENT | XML_PARSE_DTDLOAD (line 35) after granting libxml2-wasm host filesystem access (line 22), so external entities such as file:///etc/passwd resolve (line 38); handleXmlUpload in routes/fileUpload.ts feeds it the raw bytes of an uploaded .xml file and echoes the result in the error message. Gated: the XML branch only runs when the deprecated-interface challenge is enabled, which it is not on Docker or Heroku."
+  source: advisory
+  source_ref: "https://github.com/juice-shop/pwning-juice-shop/blob/d5488d68b4cd892784494224e4f6b8f48102cc30/docs/modules/ROOT/pages/part2/xxe.adoc?plain=1#L75-L80"
+  reviewed_by: [claude-code]
+  labeled_by: {job: public-demo, prompt_version: 1, date: 2026-09-24}
+  also:
+    - file: routes/fileUpload.ts
+      span: [70, 77]

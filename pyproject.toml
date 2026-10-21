@@ -1,0 +1,33 @@
+[project]
+name = "rvh"
+version = "0.1.0"
+description = "Find and rank candidate vulnerabilities with sandboxed LLM workers, for a reviewer to confirm"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+# Base deps must cover everything the run path imports: `rvh` bootstraps with
+# a bare `pip install -e .` (no extras), so a module that lands in an optional
+# extra is a crash on any machine whose global interpreter doesn't happen to
+# have it. pyyaml lived in [dev] and took down the first worker launch.
+dependencies = [
+    "requests>=2.31",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "requests-mock>=1.11",
+    "mcp[cli]>=1.0,<2",
+    "jsonschema>=4.20",
+]
+
+[tool.setuptools]
+# No importable Python package to install — scripts/ is a flat collection of tools,
+# added to sys.path by tests/conftest.py. This disables setuptools auto-discovery
+# which otherwise chokes on the flat layout (scripts/, tests/, docs/, etc.).
+py-modules = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"

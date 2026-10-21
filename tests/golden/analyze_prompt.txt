@@ -1,0 +1,86 @@
+Classify every top-level directory of this repository for vulnerability analysis. Emit a JSON object with 6 categorical arrays + rationale.
+
+## Repository tree
+
+The full directory tree. Build/manifest files are marked with ` (*)`.
+Skipped noise directories (`node_modules/`, `.git/`, `dist/`, etc.) are
+shown with `(skipped)`. Repetitive runs of files with the same extension
+are compressed as `[N .ext files: a, b, c, +K more]` — treat the count
+and sample names as full signal for that directory's content type.
+
+src/
+  scitokens.cpp
+  scitokens_internal.cpp
+test/
+  main.cpp
+
+
+## Language summary
+
+- Extensions: {".cpp": 3, ".h": 2}
+- Categories: {"code": 5}
+- Framework hints: ["cmake"]
+
+## README (first 4KB)
+
+SciTokens C++ library.
+
+## Categories
+
+- **production_paths** — Production code: user/network input handlers, authorization, business logic, data persistence, security-relevant behavior.
+- **test_paths** — Tests, fixtures, harnesses. For Go, includes dirs hosting `*_test.go` files; leaf tests live in production_paths.
+- **ci_paths** — CI/CD: `.github/`, `.gitlab/`, `.circleci/`, etc.
+- **docs_paths** — Documentation only; no executable code.
+- **tooling_paths** — Dev tooling, scripts, `tools/` dirs; not shipped.
+- **generated_paths** — Auto-generated or vendored: `swagger/`, `bindings/`, protobuf stubs, third-party assets (`jquery.min.js`, `bootstrap.min.css`, etc.).
+
+Each directory appears in exactly one category. Directories fitting none may be omitted.
+
+## Canonical bucket rules (no deliberation)
+
+These directory names always map to the same bucket — do not place them anywhere else:
+
+- `.github/`, `.gitlab/`, `.circleci/`, `.buildkite/`, `.azure-pipelines/` → **ci_paths**
+- `node_modules/`, `vendor/`, `dist/`, `build/`, `target/`, `out/`, `.next/`, `__pycache__/` → **generated_paths**
+- `tests/`, `test/`, `spec/` → **test_paths**
+
+If your reasoning trace identifies one of these directories under the canonical name, the JSON output bucket MUST match. Putting `.github/` in production_paths after reasoning that it contains CI configuration is a contradiction — the JSON drives downstream behavior, the trace doesn't.
+
+## Vendored asset detection
+
+When an asset directory (`static/`, `assets/`, `public/`, `media/`, `lib/`) contains files like `*.min.js`, `*.min.css`, `*@<version>.*`, `*-<major>.<minor>.<patch>.*`, or files named after known third-party libraries (`jquery*`, `bootstrap*`, `leaflet*`, `highcharts*`, `echarts*`, `react*`, `vue*`, etc.), the directory is **vendored** and belongs in `generated_paths`. Vendored content is not first-party application code; the pipeline reviews it at lowest priority.
+
+If you see e.g. `gui/static/ancillary/js/jquery.min.js` in the tree, classify `gui/static/ancillary/js/` (or its parent if the whole subtree is vendored) as `generated_paths`. Do not bucket vendored asset directories into `production_paths` because their parent directory is the application source root.
+
+## Output schema
+
+```
+{
+  "production_paths": [<repo-relative paths with trailing slash>],
+  "test_paths": [<same>],
+  "ci_paths": [<same>],
+  "docs_paths": [<same>],
+  "tooling_paths": [<same>],
+  "generated_paths": [<same>],
+  "rationale": "<one to three sentences>"
+}
+```
+
+All six arrays required (may be empty). Paths: forward slashes, trailing slash, repo-relative (no leading slash). Rationale: non-empty string.
+
+## Self-check before emitting
+
+After drafting the JSON, scan your reasoning trace once more:
+
+1. For every directory you mentioned in the trace, does the bucket assignment in the trace match the bucket in the JSON? If you wrote "X is CI" anywhere, X must be in `ci_paths`, not production_paths.
+2. Did you check vendored asset directories from the tree? Any directory containing `*.min.js`, `*@<version>.*`, or named third-party libraries belongs in `generated_paths`.
+3. Are the canonical-rule directories above (`.github/`, `node_modules/`, etc.) in their canonical buckets?
+
+Fix the JSON if any check fails before emitting.
+
+## Output rules
+
+- Single JSON code block fenced by triple backticks: ` ```json ... ``` `.
+- No prose after the JSON block.
+- Enumerate every top-level directory. On repos with >10 dirs, <5 production_paths signals under-enumeration — review the tree.
+- Keys exactly as shown; do not add, rename, or pluralize.

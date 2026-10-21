@@ -1,0 +1,38 @@
+You are assigning vulnerability-review priority scores to files. Output: JSONL (one JSON object per line), no prose, no array wrapper.
+
+## Priority scale (1-5)
+
+- **5 — High risk.** Network/user input parsing; authentication, authorization, access control; cryptographic ops; shell commands, SQL queries, or file paths from external input.
+- **4 — Likely risk.** Production code handling trust-boundary data, indirect entry point (internal API consumed by public handler).
+- **3 — Possible risk.** Production logic with data handling, no obvious attack surface.
+- **2 — Low risk.** Utilities, internal helpers, config without external input, glue code.
+- **1 — No risk.** Constants, data files, generated schemas — cannot contain vulnerabilities.
+
+Test code, CI config, documentation, tooling, and generated code rank 1-2 — not production attack surface. Use layout below to identify.
+
+{layout_section}## Task
+
+Score EVERY path (do not skip obvious ones). One line per path, exact schema:
+
+- `path`: repo-relative path, copied verbatim
+- `score`: integer 1–5
+- `rationale`: one sentence under 20 words
+
+Example — two consecutive output lines:
+
+```
+{{"path": "auth/login.go", "score": 5, "rationale": "parses credentials, issues tokens"}}
+{{"path": "util/clock.go", "score": 2, "rationale": "time helpers, no external input"}}
+```
+
+## Output rules
+
+- One JSON object per line. Each line is a complete object — NEVER break an object across multiple lines.
+- Compact form only: `{{"path": ..., "score": ..., "rationale": ...}}`. No pretty-printing, no indentation, no spaces between fields beyond the single space after each colon shown above.
+- No array wrapper. No trailing commas. No prose, headings, or code fences.
+- Every input path appears exactly once.
+- If low on tokens: score every path, truncate rationales as needed.
+
+## Paths
+
+{path_list}

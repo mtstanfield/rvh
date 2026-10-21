@@ -1,0 +1,30 @@
+- id: nodegoat-contributions-eval-1
+  repo: nodegoat
+  file: app/routes/contributions.js
+  sink_line: 32
+  span: [28, 34]
+  cwe: CWE-95
+  family: code-injection
+  severity: critical
+  truth: positive
+  status: gated
+  evidence: "handleContributionsUpdate passes the POSTed preTax field to eval() (line 32), and afterTax and roth the same way (lines 33-34), so any logged-in user can run arbitrary JavaScript in the server process (e.g. res.end(require('fs').readdirSync('.').toString())). Gated: the POST /contributions route sits behind isLoggedIn."
+  source: advisory
+  source_ref: "https://github.com/OWASP/NodeGoat/blob/c5cb68a7084e4ae7dcc60e6a98768720a81841e8/app/views/tutorial/a1.html#L150-L160"
+  reviewed_by: [claude-code]
+  labeled_by: {job: public-demo, prompt_version: 1, date: 2026-09-24}
+- id: nodegoat-research-ssrf-1
+  repo: nodegoat
+  file: app/routes/research.js
+  sink_line: 16
+  span: [14, 16]
+  cwe: CWE-918
+  family: ssrf
+  severity: high
+  truth: positive
+  status: gated
+  evidence: "displayResearch builds the fetch target from the url and symbol query parameters (line 15) and requests it with needle.get (line 16), writing the response body back to the client, so a user can make the server fetch internal hosts or cloud metadata endpoints. Gated: GET /research sits behind isLoggedIn."
+  source: advisory
+  source_ref: "https://github.com/OWASP/NodeGoat/blob/c5cb68a7084e4ae7dcc60e6a98768720a81841e8/app/views/tutorial/ssrf.html#L18-L33"
+  reviewed_by: [claude-code]
+  labeled_by: {job: public-demo, prompt_version: 1, date: 2026-09-24}

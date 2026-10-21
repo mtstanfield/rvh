@@ -1,0 +1,17 @@
+{
+  "candidates_md": true,
+  "findings": 3,
+  "joern_containers": [],
+  "leftover_containers": [],
+  "leftover_networks": [],
+  "port_8898_listening": false,
+  "region_tasks": 4,
+  "run_status": "stopped",
+  "state_files_left": [],
+  "tasks": {
+    "completed": 3,
+    "decomposed": 2,
+    "pending": 85
+  },
+  "worker_reports": 3
+}

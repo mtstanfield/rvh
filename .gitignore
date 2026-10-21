@@ -1,0 +1,17 @@
+.rvh-runs/
+.worktrees/
+bench/
+__pycache__/
+*.pyc
+._*
+.DS_Store
+.claude/
+.venv/
+*.egg-info/
+
+# goose runtime state (per-process scratch, not source)
+state.db
+
+# eval harness: pinned checkouts, CPGs, and raw run dirs
+evals/public/cache/
+evals/public/results/*/raw/
